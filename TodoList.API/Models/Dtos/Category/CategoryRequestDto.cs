@@ -1,6 +1,6 @@
 ﻿namespace TodoList.API.Models.Dtos.Category
 {
-    public class CategoryRequestDto
+    public record CategoryRequestDto
     {
         public string? Name { get; set; }
     }

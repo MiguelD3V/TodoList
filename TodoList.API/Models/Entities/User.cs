@@ -2,7 +2,7 @@
 
 namespace TodoList.API.Models.Entities
 {
-    public class User
+    public record User
     {
         public Guid Id { get; set; }
         public string? Name { get; set; }

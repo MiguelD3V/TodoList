@@ -2,7 +2,7 @@
 
 namespace TodoList.API.Models.Entities
 {
-    public class TaskItem
+    public record TaskItem
     {
         public Guid Id { get; set; }
         public string? Title { get; set; }

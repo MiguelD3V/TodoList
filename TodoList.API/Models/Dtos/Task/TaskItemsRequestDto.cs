@@ -2,7 +2,7 @@
 
 namespace TodoList.API.Models.Dtos.Task
 {
-    public class TaskItemsRequestDto
+    public record TaskItemsRequestDto
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
