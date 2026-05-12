@@ -23,17 +23,17 @@ namespace TodoList.API.Workers.Validators
                 response.IsSucess = false;
                 response.Errors.Add("A Prioridade da tarefa deve ser informada.");
             }
-            if (response.UserId == Guid.Empty)
+            if (request.UserId == Guid.Empty)
             {
                 response.IsSucess = false;
                 response.Errors.Add("O Id do usuário deve ser informado.");
             }
-            if (response.CategoryId == Guid.Empty)
+            if (request.CategoryId == Guid.Empty)
             {
                 response.IsSucess = false;
                 response.Errors.Add("O Id da categoria deve ser informado.");
             }
-            if (response.DueDate < DateTime.UtcNow)
+            if (request.DueDate < DateTime.UtcNow)
             {
                 response.IsSucess = false;
                 response.Errors.Add("A data de vencimento deve ser maior que a data atual.");
@@ -70,17 +70,17 @@ namespace TodoList.API.Workers.Validators
                 response.IsSucess = false;
                 response.Errors.Add("A Prioridade da tarefa deve ser informada.");
             }
-            if (response.UserId == Guid.Empty)
+            if (request.UserId == Guid.Empty)   
             {
                 response.IsSucess = false;
                 response.Errors.Add("O Id do usuário deve ser informado.");
             }
-            if (response.CategoryId == Guid.Empty)
+            if (request.CategoryId == Guid.Empty)
             {
                 response.IsSucess = false;
                 response.Errors.Add("O Id da categoria deve ser informado.");
             }
-            if (response.DueDate < DateTime.UtcNow)
+            if (request.DueDate < DateTime.UtcNow)
             {
                 response.IsSucess = false;
                 response.Errors.Add("A data de vencimento deve ser maior que a data atual.");

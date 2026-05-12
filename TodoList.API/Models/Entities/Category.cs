@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace TodoList.API.Models.Entities
 {
     public class Category

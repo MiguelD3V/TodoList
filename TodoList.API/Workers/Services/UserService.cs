@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using TodoList.API.Data.Interfaces;
 using TodoList.API.Models.Dtos.User;
+using TodoList.API.Models.Entities;
 using TodoList.API.Workers.Services.Interface;
 using TodoList.API.Workers.Validators.Interfaces;
 
@@ -18,29 +20,107 @@ namespace TodoList.API.Workers.Services
             _userValidator = userValidator;
         }
 
-        public Task<UserResponseDto> CreateAsync(UserRequestDto request)
+        public async Task<UserResponseDto> CreateAsync(UserRequestDto request)
         {
-            throw new NotImplementedException();
+            var validationResult = await _userValidator.ValidateDefault(request);
+            if (!validationResult.IsSucess)
+            {
+                return new UserResponseDto()
+                {
+                    IsSucess = false,
+                    Errors = validationResult.Errors
+                };
+            }
+
+            User entity = new User()
+            {
+                Name = request.Name,
+                Email = request.Email
+            };
+
+            await _userRepository.CreateUserAsync(entity);
+
+            return new UserResponseDto()
+            {
+                IsSucess = true,
+                Data = entity
+            };
         }
 
-        public Task<UserResponseDto> DeleteAsync(UserRequestDto request)
+        public async Task<UserResponseDto> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var findUser = await _userRepository.GetUserByIdAsync(id);
+            if (findUser == null)
+            {
+                throw new Exception("Usuário não encontrado.");
+            }
+
+            await _userRepository.DeleteUserAsync(findUser);
+
+            return new UserResponseDto()
+            {
+                IsSucess = true,
+                Data = findUser
+            };
         }
 
-        public Task<ImmutableList<UserResponseDto>> GetAllAsync(UserRequestDto request)
+        public async Task<ImmutableList<UserResponseDto>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var users = await _userRepository.GetAllUsersAsync();
+
+            return users
+                .Select(u => new UserResponseDto()
+            {
+                IsSucess = true,
+                Data = users
+            }).ToImmutableList();
         }
 
-        public Task<UserResponseDto> GetById(Guid id)
+        public async Task<UserResponseDto> GetById(Guid id)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetUserByIdAsync(id);
+            if(user == null)
+            {
+                throw new Exception("'Usuário não encontrado.");
+            }
+
+            return new UserResponseDto()
+            {
+               IsSucess = true,
+               Data = user
+            };
         }
 
-        public Task<UserResponseDto> UpdateAsync(UserRequestDto request)
+        public async Task<UserResponseDto> UpdateAsync(Guid id, UserRequestDto request)
         {
-            throw new NotImplementedException();
+            var validationResult = await _userValidator.ValidateDefault(request);
+            if(!validationResult.IsSucess)
+            {
+                return new UserResponseDto()
+                {
+                    IsSucess = false,
+                    Errors = validationResult.Errors
+                };
+            }
+
+           var findUser = await _userRepository.GetUserByIdAsync(id);
+
+            if(findUser == null)
+            {
+                throw new Exception("Usuário não encontrado.");
+            }
+
+          
+            findUser.Name = request.Name;
+            findUser.Email = request.Email;
+
+            await _userRepository.UpdateUserAsync(findUser);
+
+            return new UserResponseDto()
+            {
+                IsSucess = true,
+                Data = findUser
+             };
         }
     }
 }

@@ -28,32 +28,35 @@ namespace TodoList.API.Workers.Services
                 {
                     IsSucess = false,
                     Errors = validationResult.Errors
-                };  
+                };
             }
+                Category entity = new Category()
+                {
+                    Name = request.Name
+                };
 
-            Category entity = new Category()
-            {
-                Name = request.Name
-            };
-            
-            await _categoryRepository.CreateCategoryAsync(entity);
+                await _categoryRepository.CreateCategoryAsync(entity);
 
-            return new CategoryResponseDto()
-            {
-                IsSucess = true,
-                Data = entity
-            };
+                return new CategoryResponseDto()
+                {
+                    IsSucess = true,
+                    Data = entity
+                };
         }
 
         public async Task<CategoryResponseDto> DeleteAsync(Guid id)
         {
-            var findCategory = _categoryRepository.GetCategoryByIdAsync(id);
-            await _categoryRepository.DeleteCategoryAsync(findCategory.Result);
+            var findCategory = await _categoryRepository.GetCategoryByIdAsync(id);
+            if (findCategory == null) 
+            {
+                throw new Exception("A categoria não foi encontrada");
+            }
+            await _categoryRepository.DeleteCategoryAsync(findCategory);
 
             return new CategoryResponseDto()
             {
                 IsSucess = true,
-                Data = findCategory.Result
+                Data = findCategory
             };
         }
 
@@ -64,8 +67,8 @@ namespace TodoList.API.Workers.Services
             return categories
                 .Select(categories => new CategoryResponseDto()
                 {
-                    Id = categories.Id,
-                    Name = categories.Name
+                   IsSucess = true,
+                   Data = categories
                 }).ToImmutableList();
         }
 
@@ -79,14 +82,38 @@ namespace TodoList.API.Workers.Services
 
             return new CategoryResponseDto()
             {
-                Id = category.Id,
-                Name = category.Name
+                IsSucess = true,
+                Data = category
             };
         }
 
-        public Task<CategoryResponseDto> UpdateAsync(CategoryRequestDto request)
+        public async Task<CategoryResponseDto> UpdateAsync(Guid id, CategoryRequestDto request)
         {
-            throw new NotImplementedException();
+            var findCategory = await _categoryRepository.GetCategoryByIdAsync(id);
+            if (findCategory == null)
+            {
+                throw new Exception("A categoria não foi encontrada");
+            }
+
+            var validationResult = await _categoryValidator.ValidateDefault(request);
+            if (!validationResult.IsSucess)
+            {
+                return new CategoryResponseDto()
+                {
+                    IsSucess = false,
+                    Errors = validationResult.Errors
+                };
+            }
+
+            findCategory.Name = request.Name;
+
+            await _categoryRepository.UpdateCategoryAsync(findCategory);
+
+            return new CategoryResponseDto()
+            {
+                IsSucess = true,
+                Data = findCategory
+            };
         }
     }
 }
